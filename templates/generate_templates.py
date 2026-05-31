@@ -91,49 +91,49 @@ def checkbox(c, x, y, s=11, col=MID):
 # ============================================================
 # DESIGN 1 — "Cornell" : familiar, two-column, structured recall
 # ============================================================
-def design_cornell(c):
+# --- Notes-area line-spacing presets (base units; x2.5 -> Manta px; ~mm @300dpi) ---
+GAP_TIGHT, GAP_MED, GAP_WIDE = 42, 52, 66   # ~9mm / ~11mm / ~14mm
+
+
+def design_cornell(c, note_gap=GAP_MED, page_num=None, total=None, link_back_to=None):
     # --- header band ---
     c.setFillColor(BAND)
     c.rect(0, H - 92, W, 92, stroke=0, fill=1)
     label(c, M, H - 42, "Book Capture", size=15, col=INK)
     label(c, M, H - 64, "Cornell method  ·  one page per chapter", size=8, col=MID, tracking=False)
     # meta fields top-right
-    c.setFont("Helvetica", 9); c.setFillColor(DARK)
     fx = W - M - 250
-    for i, (lab, w) in enumerate([("BOOK", 250), ("CH.", 120), ("DATE", 120)]):
-        pass
-    # row of meta
     label(c, fx, H - 36, "BOOK", 7.5, MID); line(c, fx + 34, H - 38, W - M, H - 38, LIGHT)
     label(c, fx, H - 58, "CH.", 7.5, MID);  line(c, fx + 34, H - 60, fx + 120, H - 60, LIGHT)
     label(c, fx + 140, H - 58, "DATE", 7.5, MID); line(c, fx + 180, H - 60, W - M, H - 60, LIGHT)
+    # page number (multi-page notebooks only)
+    if page_num is not None:
+        c.setFillColor(MID); c.setFont("Helvetica", 7)
+        c.drawCentredString(W / 2, H - 86, "page %02d%s" % (page_num, ("  /  %d" % total) if total else ""))
 
     y = H - 92
     # --- guiding question strip ---
     gh = 56
     rrect(c, M, y - gh, W - 2 * M, gh, r=8, stroke=LIGHT)
     label(c, M + 12, y - 18, "Guiding question(s)", 8, MID)
-    ruled(c, M + 12, y - 34, W - 2 * M - 24, 1, 0, FAINT)
+    line(c, M + 12, y - 34, W - M - 12, y - 34, FAINT, 0.7)
     line(c, M + 12, y - 44, W - M - 12, y - 44, FAINT, 0.7)
     y -= gh + 16
 
-    # --- main: cue column + notes ---
+    # --- main: cue column + notes (rules aligned across both, true Cornell) ---
     main_top = y
-    main_bot = M + 250
+    main_bot = M + 215
     cue_w = 150
-    # divider
     line(c, M + cue_w, main_top, M + cue_w, main_bot, MID, 1.0)
     line(c, M, main_top, W - M, main_top, MID, 1.0)
     line(c, M, main_bot, W - M, main_bot, MID, 1.0)
     label(c, M + 6, main_top - 16, "Cues / keywords", 7.5, MID)
     label(c, M + cue_w + 10, main_top - 16, "Notes  (while reading)", 7.5, MID)
-    # faint rules in notes area
     ny = main_top - 34
     while ny > main_bot + 8:
-        line(c, M + cue_w + 8, ny, W - M - 8, ny, FAINT, 0.6)
-        ny -= 26
-    # cue area: just a couple of tag underlines
-    for i in range(4):
-        line(c, M + 6, main_top - 40 - i * 30, M + cue_w - 8, main_top - 40 - i * 30, FAINT, 0.6)
+        line(c, M + 6, ny, M + cue_w - 8, ny, FAINT, 0.6)          # cue rule
+        line(c, M + cue_w + 8, ny, W - M - 8, ny, FAINT, 0.6)      # notes rule (aligned)
+        ny -= note_gap
 
     # --- free recall band (emphasised) ---
     fr_h = 96
@@ -148,23 +148,23 @@ def design_cornell(c):
     # --- atomic seeds + connections/quotes (two columns) ---
     by = fr_top - fr_h - 16
     col_w = (W - 2 * M - 16) / 2
-    # left: atomic seeds
     label(c, M, by, "Atomic note seeds  (one idea each, my words)", 7.5, MID)
     for i in range(3):
         checkbox(c, M, by - 22 - i * 26, 10)
         line(c, M + 18, by - 22 - i * 26, M + col_w, by - 22 - i * 26, FAINT, 0.7)
-    # right: connects + quotes
     rx = M + col_w + 16
     label(c, rx, by, "Connects to  /  quotes (pg)", 7.5, MID)
     for i in range(3):
         line(c, rx, by - 22 - i * 26, rx + col_w, by - 22 - i * 26, FAINT, 0.7)
 
-    # footer review tracker
-    line(c, M, M + 30, W - M, M + 30, LIGHT, 0.8)
-    label(c, M, M + 14, "Reviewed:", 7.5, MID)
-    for i, d in enumerate(["1d", "1w", "1m", "3m"]):
-        checkbox(c, M + 70 + i * 70, M + 6, 11)
-        text(c, M + 86 + i * 70, M + 8, d, 8, MID)
+    # optional "back to index" button (multi-page linked notebook)
+    if link_back_to is not None:
+        bw, bh = 104, 22
+        bx, byk = W - M - bw, M + 6
+        rrect(c, bx, byk, bw, bh, r=6, stroke=MID, sw=1.0)
+        c.setFillColor(DARK); c.setFont("Helvetica-Bold", 8)
+        c.drawCentredString(bx + bw / 2, byk + 7, "«  INDEX")
+        c.linkRect("", link_back_to, (bx, byk, bx + bw, byk + bh), Border='[0 0 0]', relative=0)
 
 
 # ============================================================
@@ -291,7 +291,59 @@ def build(path, drawfn, title):
     print("wrote", path)
 
 
+def build_index_pdf(path, n_pages=60, note_gap=GAP_MED, title="Book Notes - Cornell"):
+    """Multi-page notebook: an Index page hyperlinked to N Cornell capture pages."""
+    c = canvas.Canvas(path, pagesize=(W, H))
+    c.setTitle(title)
+
+    # ---------- INDEX / HOME page ----------
+    c.bookmarkPage("index")
+    c.setFillColor(DARK); c.rect(0, H - 84, W, 84, stroke=0, fill=1)
+    c.setFillColor(white); c.setFont("Helvetica-Bold", 16)
+    c.drawString(M, H - 48, "INDEX")
+    c.setFillColor(Color(0.85, 0.85, 0.85)); c.setFont("Helvetica", 8)
+    c.drawString(M, H - 66, "tap an entry to jump to its capture page  ·  write book + chapter on the line")
+    c.setFillColor(white); c.setFont("Helvetica", 8)
+    c.drawRightString(W - M, H - 48, "BOOK ____________________")
+
+    cols = 3
+    rows = n_pages // cols
+    gy_top = H - 108
+    col_w = (W - 2 * M) / cols
+    row_h = (gy_top - (M + 32)) / rows
+    for i in range(n_pages):
+        num = i + 1
+        col = i // rows
+        row = i % rows
+        ex = M + col * col_w
+        ey = gy_top - row * row_h
+        c.setFillColor(INK); c.setFont("Helvetica-Bold", 9)
+        c.drawString(ex + 4, ey - 11, "%02d" % num)
+        line(c, ex + 26, ey - 13, ex + col_w - 12, ey - 13, FAINT, 0.7)
+        # tappable area over the whole entry row
+        c.linkRect("", "page%02d" % num, (ex, ey - row_h + 4, ex + col_w - 8, ey + 3),
+                   Border='[0 0 0]', relative=0)
+    line(c, M, M + 24, W - M, M + 24, LIGHT, 0.8)
+    label(c, M, M + 8, "Cornell capture  ·  %d pages  ·  keep keywords in the cue column for search" % n_pages,
+          7.5, MID, tracking=False)
+    c.showPage()
+
+    # ---------- capture pages ----------
+    for i in range(n_pages):
+        num = i + 1
+        c.bookmarkPage("page%02d" % num)
+        design_cornell(c, note_gap=note_gap, page_num=num, total=n_pages, link_back_to="index")
+        c.showPage()
+
+    c.save()
+    print("wrote", path, "(%d pages)" % (n_pages + 1))
+
+
 if __name__ == "__main__":
+    # --- original three comparison designs (unchanged) ---
     build("supernote-template-1-cornell.pdf",   design_cornell,   "Supernote Template 1 - Cornell")
     build("supernote-template-2-slipbox.pdf",   design_slipbox,   "Supernote Template 2 - Slip-box")
     build("supernote-template-3-dashboard.pdf", design_dashboard, "Supernote Template 3 - Dashboard")
+
+    # --- finalized Cornell: medium spacing, repeating template (chosen) ---
+    build("supernote-cornell-medium.pdf", lambda c: design_cornell(c, note_gap=GAP_MED), "Cornell - medium")

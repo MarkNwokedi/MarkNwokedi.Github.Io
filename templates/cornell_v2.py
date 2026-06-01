@@ -120,9 +120,9 @@ def write_rules(c, x1, x2, y_first, n, col=WRITE, w=0.8):
 # ---------- layout constants ----------
 LABEL_GAP = 44.0   # label baseline -> first writing rule (generous clearance under the divider)
 ZONE_GAP  = 20.0   # bottom rule of a zone -> next label baseline
-N_NOTES   = 10     # hero line count (dominant zone)
-N_RECALL  = 4
-N_SEEDS   = 3
+N_NOTES   = 10     # notes lines on the separate Notes page
+N_RECALL  = 12     # free recall is the hero of the recall page
+N_SEEDS   = 5
 
 
 # ---------- the page ----------
@@ -135,7 +135,7 @@ def design(c):
     title_base = H - M - 22
     c.setFillColor(INK); c.setFont(SERIF_B, 30)
     c.drawString(L, title_base, "Book Capture")
-    helper(c, L, title_base - 17, "Cornell capture  ·  one page per chapter", HELP, 8.5)
+    helper(c, L, title_base - 17, "recall & distill  ·  notes go on the Notes page  ·  one per chapter", HELP, 8.5)
 
     # meta fields: right-aligned stacked block (BOOK on top, CH. + DATE below).
     # Bottom row baseline aligns with the serif title baseline for a tight lockup.
@@ -163,25 +163,8 @@ def design(c):
     hline(c, L, R, gq_top - P, col=WRITE)
     gq_bottom = gq_top - P
 
-    # ============ 3. CORNELL CORE (hero) ============
-    core_label_y = gq_bottom - ZONE_GAP
-    cue_w = 158
-    cue_x = L
-    notes_x = L + cue_w + 20
-    section_label(c, cue_x, core_label_y, L + cue_w, "Cues")
-    section_label(c, notes_x, core_label_y, R, "Notes", tick=False,
-                  helper_text="while reading")
-
-    core_top = core_label_y - LABEL_GAP
-    core_bottom = core_top - (N_NOTES - 1) * P
-    for i in range(N_NOTES):
-        y = core_top - i * P
-        hline(c, cue_x, L + cue_w - 8, y, col=WRITE)        # cue rule
-        hline(c, notes_x, R, y, col=WRITE)                  # notes rule (aligned)
-    vline(c, L + cue_w, core_top + 14, core_bottom - 12, col=STRUCT, w=1.1)
-
-    # ============ 4. FREE RECALL ============
-    fr_label_y = core_bottom - ZONE_GAP
+    # ============ 3. FREE RECALL (hero — notes live on separate Notes pages) ============
+    fr_label_y = gq_bottom - ZONE_GAP
     section_label(c, L, fr_label_y, R, "Free recall", tick=True,
                   helper_text="book closed — what did it argue?  takeaway?")
     fr_top = fr_label_y - LABEL_GAP
@@ -226,7 +209,7 @@ def design_notes_cont(c):
     title_base = H - M - 4
     c.setFillColor(INK); c.setFont(SERIF_B, 18)
     c.drawString(L, title_base - 12, "Notes")
-    helper(c, L, title_base - 26, "continuation  ·  keep keywords in the cue column", HELP, 8)
+    helper(c, L, title_base - 26, "while reading  ·  keep keywords in the cue column", HELP, 8)
 
     # meta: chapter + page only (the book is known from the lead page)
     my = title_base - 10

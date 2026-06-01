@@ -187,21 +187,31 @@ def design(c):
         hline(c, L, R, fr_top - i * P, col=WRITE)
     fr_bottom = fr_top - 2 * P
 
-    # ============ 5. SEEDS + CONNECTIONS ============
+    # ============ 5. SEEDS + GAPS ============
     half = (inner - 28) / 2
     sx1 = L
     sx2 = L + half + 28
     seed_label_y = fr_bottom - ZONE_GAP
     section_label(c, sx1, seed_label_y, sx1 + half, "Atomic note seeds",
                   helper_text="one idea each")
-    section_label(c, sx2, seed_label_y, sx2 + half, "Connects to / quotes", tick=False,
-                  helper_text="page")
+    section_label(c, sx2, seed_label_y, sx2 + half, "Gaps", tick=False)
     seed_top = seed_label_y - LABEL_GAP
+
+    # gaps: two aligned sub-fields — what the gap was, and how it was closed
+    subgap = 14
+    subw = (half - subgap) / 2
+    gx1 = sx2                          # "what it was"
+    gx2 = sx2 + subw + subgap          # "how it was closed"
+    helper(c, gx1, seed_label_y - 19, "what it was", HELP, 6.5)
+    helper(c, gx2, seed_label_y - 19, "how it was closed", HELP, 6.5)
+    vline(c, gx1 + subw + subgap / 2, seed_top + 8, seed_top - 2 * P - 6, col=RULE, w=0.6)
+
     for i in range(3):
         y = seed_top - i * P
         checkbox(c, sx1, y - 4, 11)
-        hline(c, sx1 + 20, sx1 + half, y, col=WRITE)
-        hline(c, sx2, sx2 + half, y, col=WRITE)
+        hline(c, sx1 + 20, sx1 + half, y, col=WRITE)     # seed line
+        hline(c, gx1, gx1 + subw, y, col=WRITE)          # gap: what it was
+        hline(c, gx2, gx2 + subw, y, col=WRITE)          # gap: how it was closed
 
 
 def build_pdf(path):

@@ -121,8 +121,9 @@ def write_rules(c, x1, x2, y_first, n, col=WRITE, w=0.8):
 LABEL_GAP = 44.0   # label baseline -> first writing rule (generous clearance under the divider)
 ZONE_GAP  = 20.0   # bottom rule of a zone -> next label baseline
 N_NOTES   = 10     # notes lines on the separate Notes page
-N_RECALL  = 12     # free recall is the hero of the recall page
-N_SEEDS   = 5
+N_RECALL  = 9      # free recall (some space given to the stacked seeds/gaps below)
+N_SEEDS   = 4
+N_GAPS    = 4
 
 
 # ---------- the page ----------
@@ -172,29 +173,29 @@ def design(c):
         hline(c, L, R, fr_top - i * P, col=WRITE)
     fr_bottom = fr_top - (N_RECALL - 1) * P
 
-    # ============ 5. SEEDS + GAPS ============
-    half = (inner - 28) / 2
-    sx1 = L
-    sx2 = L + half + 28
+    # ============ 4. ATOMIC NOTE SEEDS (full width) ============
     seed_label_y = fr_bottom - ZONE_GAP
-    section_label(c, sx1, seed_label_y, sx1 + half, "Atomic note seeds",
-                  helper_text="one idea each")
-    section_label(c, sx2, seed_label_y, sx2 + half, "Gaps", tick=False)
+    section_label(c, L, seed_label_y, R, "Atomic note seeds", helper_text="one idea each")
     seed_top = seed_label_y - LABEL_GAP
-
-    # gaps: two aligned sub-fields — what the gap was, and how it was closed
-    subgap = 14
-    subw = (half - subgap) / 2
-    gx1 = sx2                          # "what it was"
-    gx2 = sx2 + subw + subgap          # "how it was closed"
-    helper(c, gx1, seed_label_y - 19, "what it was", HELP, 6.5)
-    helper(c, gx2, seed_label_y - 19, "how it was closed", HELP, 6.5)
-    vline(c, gx1 + subw + subgap / 2, seed_top + 8, seed_top - (N_SEEDS - 1) * P - 6, col=RULE, w=0.6)
-
     for i in range(N_SEEDS):
         y = seed_top - i * P
-        checkbox(c, sx1, y - 4, 11)
-        hline(c, sx1 + 20, sx1 + half, y, col=WRITE)     # seed line
+        checkbox(c, L, y - 4, 11)
+        hline(c, L + 20, R, y, col=WRITE)
+    seed_bottom = seed_top - (N_SEEDS - 1) * P
+
+    # ============ 5. GAPS (full width, two sub-fields) ============
+    gaps_label_y = seed_bottom - ZONE_GAP
+    section_label(c, L, gaps_label_y, R, "Gaps")
+    subgap = 24
+    subw = (inner - subgap) / 2
+    gx1 = L                          # "what it was"
+    gx2 = L + subw + subgap          # "how it was closed"
+    helper(c, gx1, gaps_label_y - 19, "what it was", HELP, 6.5)
+    helper(c, gx2, gaps_label_y - 19, "how it was closed", HELP, 6.5)
+    gaps_top = gaps_label_y - LABEL_GAP
+    vline(c, gx1 + subw + subgap / 2, gaps_top + 8, gaps_top - (N_GAPS - 1) * P - 6, col=RULE, w=0.6)
+    for i in range(N_GAPS):
+        y = gaps_top - i * P
         hline(c, gx1, gx1 + subw, y, col=WRITE)          # gap: what it was
         hline(c, gx2, gx2 + subw, y, col=WRITE)          # gap: how it was closed
 

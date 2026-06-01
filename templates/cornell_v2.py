@@ -216,10 +216,53 @@ def design(c):
         hline(c, gx2, gx2 + subw, y, col=WRITE)          # gap: how it was closed
 
 
-def build_pdf(path):
+def design_notes_cont(c):
+    """Full-page Cues + Notes continuation sheet — add as many as a chapter needs."""
+    L = M
+    R = W - M
+    inner = R - L
+
+    # compact identity header
+    title_base = H - M - 4
+    c.setFillColor(INK); c.setFont(SERIF_B, 18)
+    c.drawString(L, title_base - 12, "Notes")
+    helper(c, L, title_base - 26, "continuation  ·  keep keywords in the cue column", HELP, 8)
+
+    mx = L + inner * 0.60
+    tracked(c, mx, title_base - 4, "BOOK", SANS_B, 7.5, LABEL, 1.4)
+    hline(c, mx + 38, R, title_base - 6, col=RULE, w=0.9)
+    tracked(c, mx, title_base - 22, "CH.", SANS_B, 7.5, LABEL, 1.4)
+    hline(c, mx + 30, mx + inner * 0.18, title_base - 24, col=RULE, w=0.9)
+    px = mx + inner * 0.24
+    tracked(c, px, title_base - 22, "PAGE", SANS_B, 7.5, LABEL, 1.4)
+    hline(c, px + 42, R, title_base - 24, col=RULE, w=0.9)
+
+    id_rule = title_base - 36
+    hline(c, L, R, id_rule, col=INK, w=1.5)
+
+    # cues + notes, filling the rest of the page
+    cue_w = 158
+    notes_x = L + cue_w + 20
+    label_y = id_rule - 26
+    section_label(c, L, label_y, L + cue_w, "Cues")
+    section_label(c, notes_x, label_y, R, "Notes", tick=False, helper_text="while reading")
+
+    top = label_y - LABEL_GAP
+    rules = []
+    y = top
+    while y > M + 10:
+        rules.append(y)
+        y -= P
+    for ry in rules:
+        hline(c, L, L + cue_w - 8, ry, col=WRITE)          # cue rule
+        hline(c, notes_x, R, ry, col=WRITE)                # notes rule (aligned)
+    vline(c, L + cue_w, top + 14, rules[-1] - 4, col=STRUCT, w=1.1)
+
+
+def build_pdf(path, fn=design, title="Book Capture — Cornell"):
     c = canvas.Canvas(path, pagesize=(W, H))
-    c.setTitle("Book Capture — Cornell")
-    design(c)
+    c.setTitle(title)
+    fn(c)
     c.showPage()
     c.save()
     print("wrote", path)
@@ -240,8 +283,12 @@ def render_png(pdf_path, png_path, target_w=None):
 
 
 if __name__ == "__main__":
+    # main Book Capture (chapter lead page)
     build_pdf("supernote-cornell-medium.pdf")
-    # working preview (~1.4x)
     render_png("supernote-cornell-medium.pdf", "preview-v2.png", target_w=1075)
-    # final device export: exactly 1920x2560 (2.5x of 768x1024)
     render_png("supernote-cornell-medium.pdf", "supernote-cornell-medium-manta.png", target_w=1920)
+
+    # Notes continuation sheet (add as many as a chapter needs)
+    build_pdf("supernote-notes-cont.pdf", fn=design_notes_cont, title="Notes (continuation)")
+    render_png("supernote-notes-cont.pdf", "preview-notes-cont.png", target_w=1075)
+    render_png("supernote-notes-cont.pdf", "supernote-notes-cont-manta.png", target_w=1920)

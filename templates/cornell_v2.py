@@ -34,7 +34,7 @@ except Exception:
 # ---- page geometry ----
 W, H = 768.0, 1024.0
 M = 56.0                 # equal outer margin
-P = 52.0                 # ONE writing-line pitch everywhere (~11mm on device)
+P = 38.0                 # ONE writing-line pitch everywhere (~8mm on device)
 
 # ---- grayscale palette (e-ink; high contrast) ----
 INK    = Color(0, 0, 0)          # primary marks / title
@@ -118,9 +118,11 @@ def write_rules(c, x1, x2, y_first, n, col=WRITE, w=0.8):
 
 
 # ---------- layout constants ----------
-LABEL_GAP = 38.0   # label baseline -> first writing rule (clears the double-rule)
-ZONE_GAP  = 28.0   # bottom rule of a zone -> next label baseline
-N_NOTES   = 7      # hero line count (dominant zone)
+LABEL_GAP = 32.0   # label baseline -> first writing rule (clears the double-rule)
+ZONE_GAP  = 24.0   # bottom rule of a zone -> next label baseline
+N_NOTES   = 10     # hero line count (dominant zone)
+N_RECALL  = 4
+N_SEEDS   = 4
 
 
 # ---------- the page ----------
@@ -183,9 +185,9 @@ def design(c):
     section_label(c, L, fr_label_y, R, "Free recall", tick=True,
                   helper_text="book closed — what did it argue?  takeaway?")
     fr_top = fr_label_y - LABEL_GAP
-    for i in range(3):
+    for i in range(N_RECALL):
         hline(c, L, R, fr_top - i * P, col=WRITE)
-    fr_bottom = fr_top - 2 * P
+    fr_bottom = fr_top - (N_RECALL - 1) * P
 
     # ============ 5. SEEDS + GAPS ============
     half = (inner - 28) / 2
@@ -204,9 +206,9 @@ def design(c):
     gx2 = sx2 + subw + subgap          # "how it was closed"
     helper(c, gx1, seed_label_y - 19, "what it was", HELP, 6.5)
     helper(c, gx2, seed_label_y - 19, "how it was closed", HELP, 6.5)
-    vline(c, gx1 + subw + subgap / 2, seed_top + 8, seed_top - 2 * P - 6, col=RULE, w=0.6)
+    vline(c, gx1 + subw + subgap / 2, seed_top + 8, seed_top - (N_SEEDS - 1) * P - 6, col=RULE, w=0.6)
 
-    for i in range(3):
+    for i in range(N_SEEDS):
         y = seed_top - i * P
         checkbox(c, sx1, y - 4, 11)
         hline(c, sx1 + 20, sx1 + half, y, col=WRITE)     # seed line

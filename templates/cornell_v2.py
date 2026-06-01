@@ -228,14 +228,14 @@ def design_notes_cont(c):
     c.drawString(L, title_base - 12, "Notes")
     helper(c, L, title_base - 26, "continuation  ·  keep keywords in the cue column", HELP, 8)
 
-    mx = L + inner * 0.60
-    tracked(c, mx, title_base - 4, "BOOK", SANS_B, 7.5, LABEL, 1.4)
-    hline(c, mx + 38, R, title_base - 6, col=RULE, w=0.9)
-    tracked(c, mx, title_base - 22, "CH.", SANS_B, 7.5, LABEL, 1.4)
-    hline(c, mx + 30, mx + inner * 0.18, title_base - 24, col=RULE, w=0.9)
-    px = mx + inner * 0.24
-    tracked(c, px, title_base - 22, "PAGE", SANS_B, 7.5, LABEL, 1.4)
-    hline(c, px + 42, R, title_base - 24, col=RULE, w=0.9)
+    # meta: chapter + page only (the book is known from the lead page)
+    my = title_base - 10
+    mx = L + inner * 0.58
+    tracked(c, mx, my, "CH.", SANS_B, 7.5, LABEL, 1.4)
+    hline(c, mx + 30, mx + inner * 0.20, my - 2, col=RULE, w=0.9)
+    px = mx + inner * 0.26
+    tracked(c, px, my, "PAGE", SANS_B, 7.5, LABEL, 1.4)
+    hline(c, px + 42, R, my - 2, col=RULE, w=0.9)
 
     id_rule = title_base - 36
     hline(c, L, R, id_rule, col=INK, w=1.5)

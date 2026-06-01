@@ -118,8 +118,8 @@ def write_rules(c, x1, x2, y_first, n, col=WRITE, w=0.8):
 
 
 # ---------- layout constants ----------
-LABEL_GAP = 30.0   # label baseline -> first writing rule
-ZONE_GAP  = 34.0   # bottom rule of a zone -> next label baseline
+LABEL_GAP = 38.0   # label baseline -> first writing rule (clears the double-rule)
+ZONE_GAP  = 28.0   # bottom rule of a zone -> next label baseline
 N_NOTES   = 7      # hero line count (dominant zone)
 
 

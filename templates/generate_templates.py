@@ -111,51 +111,57 @@ def design_cornell(c, note_gap=GAP_MED, page_num=None, total=None, link_back_to=
         c.setFillColor(MID); c.setFont("Helvetica", 7)
         c.drawCentredString(W / 2, H - 86, "page %02d%s" % (page_num, ("  /  %d" % total) if total else ""))
 
-    y = H - 92
-    # --- guiding question strip ---
-    gh = 56
-    rrect(c, M, y - gh, W - 2 * M, gh, r=8, stroke=LIGHT)
-    label(c, M + 12, y - 18, "Guiding question(s)", 8, MID)
-    line(c, M + 12, y - 34, W - M - 12, y - 34, FAINT, 0.7)
-    line(c, M + 12, y - 44, W - M - 12, y - 44, FAINT, 0.7)
-    y -= gh + 16
+    P = note_gap  # one pitch for EVERY writing line -> consistent spacing throughout
 
-    # --- main: cue column + notes (rules aligned across both, true Cornell) ---
-    main_top = y
-    main_bot = M + 215
+    # --- guiding question (2 lines, boxed) ---
+    gq_top = H - 92
+    gq_l1 = gq_top - 40
+    gq_l2 = gq_l1 - P
+    gq_bottom = gq_l2 - 18
+    rrect(c, M, gq_bottom, W - 2 * M, gq_top - gq_bottom, r=8, stroke=LIGHT)
+    label(c, M + 12, gq_top - 18, "Guiding question(s)", 8, MID)
+    line(c, M + 12, gq_l1, W - M - 12, gq_l1, FAINT, 0.7)
+    line(c, M + 12, gq_l2, W - M - 12, gq_l2, FAINT, 0.7)
+
     cue_w = 150
+    col_w = (W - 2 * M - 16) / 2
+    rx = M + col_w + 16
+
+    # --- atomic seeds + connections (3 lines each, same pitch) — laid out from the margin up ---
+    seed_y = [M + 26 + i * P for i in range(3)]      # i=0 is the lowest line
+    seed_top = seed_y[-1]
+    label(c, M, seed_top + 20, "Atomic note seeds  (one idea each, my words)", 7.5, MID)
+    label(c, rx, seed_top + 20, "Connects to  /  quotes (pg)", 7.5, MID)
+    for ly in seed_y:
+        checkbox(c, M, ly - 5, 10)
+        line(c, M + 18, ly, M + col_w, ly, FAINT, 0.7)
+        line(c, rx, ly, rx + col_w, ly, FAINT, 0.7)
+
+    # --- free recall band (3 lines, emphasised, boxed) — sits above seeds ---
+    fr_bottom = seed_top + 20 + 14
+    fr_l = [fr_bottom + 24 + i * P for i in range(3)]  # i=0 lowest
+    fr_label_y = fr_l[-1] + 22
+    fr_top = fr_label_y + 14
+    c.setFillColor(BAND)
+    c.roundRect(M, fr_bottom, W - 2 * M, fr_top - fr_bottom, 8, stroke=0, fill=1)
+    rrect(c, M, fr_bottom, W - 2 * M, fr_top - fr_bottom, r=8, stroke=MID, sw=1.2)
+    label(c, M + 12, fr_label_y - 4, "Free recall  —  book closed:  what did it argue? takeaway?", 8, INK)
+    for ly in fr_l:
+        line(c, M + 12, ly, W - M - 12, ly, LIGHT, 0.7)
+
+    # --- main: cue column + notes (fills the middle, same pitch, rules aligned) ---
+    main_top = gq_bottom - 16
+    main_bot = fr_top + 14
     line(c, M + cue_w, main_top, M + cue_w, main_bot, MID, 1.0)
     line(c, M, main_top, W - M, main_top, MID, 1.0)
     line(c, M, main_bot, W - M, main_bot, MID, 1.0)
     label(c, M + 6, main_top - 16, "Cues / keywords", 7.5, MID)
     label(c, M + cue_w + 10, main_top - 16, "Notes  (while reading)", 7.5, MID)
     ny = main_top - 34
-    while ny > main_bot + 8:
+    while ny > main_bot + 14:
         line(c, M + 6, ny, M + cue_w - 8, ny, FAINT, 0.6)          # cue rule
         line(c, M + cue_w + 8, ny, W - M - 8, ny, FAINT, 0.6)      # notes rule (aligned)
-        ny -= note_gap
-
-    # --- free recall band (emphasised) ---
-    fr_h = 96
-    fr_top = main_bot - 14
-    c.setFillColor(BAND)
-    c.roundRect(M, fr_top - fr_h, W - 2 * M, fr_h, 8, stroke=0, fill=1)
-    rrect(c, M, fr_top - fr_h, W - 2 * M, fr_h, r=8, stroke=MID, sw=1.2)
-    label(c, M + 12, fr_top - 18, "Free recall  —  book closed:  what did it argue? takeaway?", 8, INK)
-    for i in range(3):
-        line(c, M + 12, fr_top - 36 - i * 22, W - M - 12, fr_top - 36 - i * 22, LIGHT, 0.7)
-
-    # --- atomic seeds + connections/quotes (two columns) ---
-    by = fr_top - fr_h - 16
-    col_w = (W - 2 * M - 16) / 2
-    label(c, M, by, "Atomic note seeds  (one idea each, my words)", 7.5, MID)
-    for i in range(3):
-        checkbox(c, M, by - 22 - i * 26, 10)
-        line(c, M + 18, by - 22 - i * 26, M + col_w, by - 22 - i * 26, FAINT, 0.7)
-    rx = M + col_w + 16
-    label(c, rx, by, "Connects to  /  quotes (pg)", 7.5, MID)
-    for i in range(3):
-        line(c, rx, by - 22 - i * 26, rx + col_w, by - 22 - i * 26, FAINT, 0.7)
+        ny -= P
 
     # optional "back to index" button (multi-page linked notebook)
     if link_back_to is not None:
